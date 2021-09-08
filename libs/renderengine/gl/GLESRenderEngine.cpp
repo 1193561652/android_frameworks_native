@@ -1177,6 +1177,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             mat4 texMatrix = layer->source.buffer.textureTransform;
 
             texMatrix[0] *= 2;
+            ALOGI("texMatrix: %f %f %f %f, %f %f %f %f, %f %f %f %f, %f %f %f %f", texMatrix[0], texMatrix[1], texMatrix[2], texMatrix[3], texMatrix[4], texMatrix[5], texMatrix[6], texMatrix[7], texMatrix[8], texMatrix[9], texMatrix[10], texMatrix[11], texMatrix[12], texMatrix[13], texMatrix[14], texMatrix[15]);
             texture.setMatrix(texMatrix.asArray());
             texture.setFiltering(layer->source.buffer.useTextureFiltering);
 
