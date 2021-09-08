@@ -301,7 +301,7 @@ void Output::prepare(const compositionengine::CompositionRefreshArgs& refreshArg
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
 
-    rebuildLayerStacks(refreshArgs, geomSnapshots);
+    rebuildLayerStacks(refreshArgs, geomSnapshots); //重建所有可见 Layer 列表，根据Z轴排序
 }
 
 void Output::present(const compositionengine::CompositionRefreshArgs& refreshArgs) {

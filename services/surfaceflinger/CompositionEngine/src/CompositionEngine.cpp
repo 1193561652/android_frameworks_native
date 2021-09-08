@@ -92,7 +92,7 @@ void CompositionEngine::present(CompositionRefreshArgs& args) {
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
 
-    preComposition(args);
+    preComposition(args);       //处理显示设备与 layers 的改变，更新光标
 
     {
         // latchedLayers is used to track the set of front-end layer state that

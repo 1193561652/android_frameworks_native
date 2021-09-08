@@ -788,7 +788,7 @@ FloatRect GLESRenderEngine::setupLayerCropping(const LayerSettings& layer, Mesh&
     cropCoords[2] = vec2(cropWin.right, cropWin.top + cropWin.getHeight());
     cropCoords[3] = vec2(cropWin.right, cropWin.top);
 
-    setupCornerRadiusCropSize(roundedCornersCrop.getWidth(), roundedCornersCrop.getHeight());
+    setupCornerRadiusCropSize(roundedCornersCrop.getWidth(), roundedCornersCrop.getHeight());       //圆角裁减
     return cropWin;
 }
 
@@ -1090,7 +1090,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
     // we also require a full transparent framebuffer for overlays. This is
     // probably not quite efficient on all GPUs, since we could filter out
     // opaque layers.
-    clearWithColor(0.0, 0.0, 0.0, 0.0);
+    clearWithColor(0.0, 0.0, 0.0, 0.0);                             //清空画布
 
     setOutputDataSpace(display.outputDataspace);
     setDisplayMaxLuminance(display.maxLuminance);
@@ -1103,15 +1103,15 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
     }
 
     Mesh mesh = Mesh::Builder()
-                        .setPrimitive(Mesh::TRIANGLE_FAN)
-                        .setVertices(4 /* count */, 2 /* size */)
-                        .setTexCoords(2 /* size */)
-                        .setCropCoords(2 /* size */)
+                        .setPrimitive(Mesh::TRIANGLE_FAN)            //绘制三角扇
+                        .setVertices(4 /* count */, 2 /* size */)           //4个顶点，每个顶点2大小
+                        .setTexCoords(2 /* size */)                                 //纹理坐标大小
+                        .setCropCoords(2 /* size */)                              //裁减坐标大小
                         .build();
     for (auto const layer : layers) {
         if (blurLayers.size() > 0 && blurLayers.front() == layer) {
             blurLayers.pop_front();
-
+            //绘制模糊背景?
             auto status = mBlurFilter->prepare();
             if (status != NO_ERROR) {
                 ALOGE("Failed to render blur effect! Aborting GPU composition for buffer (%p).",
@@ -1125,12 +1125,12 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
                 fbo = std::make_unique<BindNativeBufferAsFramebuffer>(*this, buffer,
                                                                       useFramebufferCache);
                 status = fbo->getStatus();
-                setViewportAndProjection(display.physicalDisplay, display.clip);
+                setViewportAndProjection(display.physicalDisplay, display.clip);            //设置视口
             } else {
                 // There's still something else to blur, so let's keep rendering to our FBO
                 // instead of to the display.
                 status = mBlurFilter->setAsDrawTarget(display,
-                                                      blurLayers.front()->backgroundBlurRadius);
+                                                      blurLayers.front()->backgroundBlurRadius);              //绘制三角形
             }
             if (status != NO_ERROR) {
                 ALOGE("Failed to bind framebuffer! Aborting GPU composition for buffer (%p).",
@@ -1139,7 +1139,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
                 return status;
             }
 
-            status = mBlurFilter->render(blurLayersSize > 1);
+            status = mBlurFilter->render(blurLayersSize > 1);           //绘制
             if (status != NO_ERROR) {
                 ALOGE("Failed to render blur effect! Aborting GPU composition for buffer (%p).",
                       buffer->handle);
@@ -1159,7 +1159,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
         position[2] = vec2(bounds.right, bounds.bottom);
         position[3] = vec2(bounds.right, bounds.top);
 
-        setupLayerCropping(*layer, mesh);
+        setupLayerCropping(*layer, mesh);           //设置裁减?
         setColorTransform(display.colorTransform * layer->colorTransform);
 
         bool usePremultipliedAlpha = true;
@@ -1170,17 +1170,17 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             isOpaque = layer->source.buffer.isOpaque;
 
             sp<GraphicBuffer> gBuf = layer->source.buffer.buffer;
-            bindExternalTextureBuffer(layer->source.buffer.textureName, gBuf,
-                                      layer->source.buffer.fence);
+            bindExternalTextureBuffer(layer->source.buffer.textureName, gBuf, layer->source.buffer.fence);      //绑定扩展材质
 
             usePremultipliedAlpha = layer->source.buffer.usePremultipliedAlpha;
             Texture texture(Texture::TEXTURE_EXTERNAL, layer->source.buffer.textureName);
             mat4 texMatrix = layer->source.buffer.textureTransform;
 
+            texMatrix[0] *= 2;
             texture.setMatrix(texMatrix.asArray());
             texture.setFiltering(layer->source.buffer.useTextureFiltering);
 
-            texture.setDimensions(gBuf->getWidth(), gBuf->getHeight());
+            texture.setDimensions(gBuf->getWidth(), gBuf->getHeight());     //设置大小
             setSourceY410BT2020(layer->source.buffer.isY410BT2020);
 
             renderengine::Mesh::VertexArray<vec2> texCoords(mesh.getTexCoordArray<vec2>());
@@ -1188,7 +1188,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             texCoords[1] = vec2(0.0, 1.0);
             texCoords[2] = vec2(1.0, 1.0);
             texCoords[3] = vec2(1.0, 0.0);
-            setupLayerTexturing(texture);
+            setupLayerTexturing(texture);   //启用纹理
         }
 
         const half3 solidColor = layer->source.solidColor;
@@ -1212,7 +1212,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
         else if (layer->geometry.roundedCornersRadius > 0.0 && color.a >= 1.0f && isOpaque) {
             handleRoundedCorners(display, *layer, mesh);
         } else {
-            drawMesh(mesh);
+            drawMesh(mesh);         //绘制 mesh
         }
 
         // Cleanup if there's a buffer source

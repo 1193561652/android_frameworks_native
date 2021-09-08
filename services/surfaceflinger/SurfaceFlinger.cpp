@@ -472,6 +472,7 @@ void SurfaceFlinger::binderDied(const wp<IBinder>&) {
     initializeDisplays();
 
     // restart the boot-animation
+    //开机动画
     startBootAnim();
 }
 
@@ -683,6 +684,7 @@ void SurfaceFlinger::init() {
     // Get a RenderEngine for the given display / config (can't fail)
     // TODO(b/77156734): We need to stop casting and use HAL types when possible.
     // Sending maxFrameBufferAcquiredBuffers as the cache size is tightly tuned to single-display.
+    //获取 RenderEngine 引擎
     mCompositionEngine->setRenderEngine(renderengine::RenderEngine::create(
             renderengine::RenderEngineCreationArgs::Builder()
                 .setPixelFormat(static_cast<int32_t>(defaultCompositionPixelFormat))
@@ -699,6 +701,7 @@ void SurfaceFlinger::init() {
 
     LOG_ALWAYS_FATAL_IF(mVrFlingerRequestsDisplay,
             "Starting with vr flinger active is not currently supported.");
+    // 初始化硬件 composer 对象
     mCompositionEngine->setHwComposer(getFactory().createHWComposer(getBE().mHwcServiceName));
     mCompositionEngine->getHwComposer().setConfiguration(this, getBE().mComposerSequenceId);
     // Process any initial hotplug and resulting display changes.
@@ -1584,6 +1587,7 @@ nsecs_t SurfaceFlinger::getVsyncPeriodFromHWC() const {
     return getHwComposer().getDisplayVsyncPeriod(*displayId);
 }
 
+//vsync 触发
 void SurfaceFlinger::onVsyncReceived(int32_t sequenceId, hal::HWDisplayId hwcDisplayId,
                                      int64_t timestamp,
                                      std::optional<hal::VsyncPeriodNanos> vsyncPeriod) {
@@ -2112,8 +2116,8 @@ void SurfaceFlinger::onMessageRefresh() {
 
     mScheduler->onDisplayRefreshed(presentTime);
 
-    postFrame();
-    postComposition();
+    postFrame();                    //翻转主 layer 的两个 buffer
+    postComposition();      //将图像传递到物理屏幕
 
     const bool prevFrameHadDeviceComposition = mHadDeviceComposition;
 

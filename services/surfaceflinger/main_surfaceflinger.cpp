@@ -93,6 +93,7 @@ int main(int, char**) {
     sp<ProcessState> ps(ProcessState::self());
     ps->startThreadPool();
 
+    // 初始化SurfaceFlinger对象，由强指针指向。SurfaceFlinger继承RefBase类，所以此处一旦new出对象赋给sp指针后，将立刻出发SurfaceFlinger类的onFirstRef方法的调用。
     // instantiate surfaceflinger
     sp<SurfaceFlinger> flinger = surfaceflinger::createSurfaceFlinger();
 
@@ -105,9 +106,11 @@ int main(int, char**) {
     // Do this after the binder thread pool init
     if (cpusets_enabled()) set_cpuset_policy(0, SP_SYSTEM);
 
+    // SurfaceFlinger类正式初始化
     // initialize before clients can connect
     flinger->init();
 
+    // SurfaceFlinger向ServiceManager注册Binder服务，这样在其他进程中，可以通过getService+SERVICE_NAME来获取SurfaceFlinger服务，继而可以和SurfaceFlinger类进行Binder通信。
     // publish surface flinger
     sp<IServiceManager> sm(defaultServiceManager());
     sm->addService(String16(SurfaceFlinger::getServiceName()), flinger, false,
@@ -119,6 +122,7 @@ int main(int, char**) {
         ALOGW("Couldn't set to SCHED_FIFO: %s", strerror(errno));
     }
 
+    // SurfaceFlinger类进入主循环（此处注意SurfaceFlinger类未继承Threads类，不遵循Threads类的接口执行顺序）
     // run surface flinger in this thread
     flinger->run();
 

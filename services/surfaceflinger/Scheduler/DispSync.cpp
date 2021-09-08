@@ -633,7 +633,7 @@ bool DispSync::addResyncSample(nsecs_t timestamp, std::optional<nsecs_t> /*hwcVs
         *periodFlushed = true;
         mThread->lockModel();
     }
-    return !modelLocked;
+    return !modelLocked;        // true 误差超过阈值
 }
 
 void DispSync::endResync() {
