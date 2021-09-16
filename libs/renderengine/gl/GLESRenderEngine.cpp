@@ -1036,7 +1036,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
         ALOGV("Drawing empty layer stack");
         return NO_ERROR;
     }
-
+    ALOGI("draw layer count:%d\n", layers.size());
     if (bufferFence.get() >= 0) {
         // Duplicate the fence for passing to waitFence.
         base::unique_fd bufferFenceDup(dup(bufferFence.get()));
@@ -1056,10 +1056,13 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
     // offscreen buffer, and when to render to the native buffer.
     std::deque<const LayerSettings*> blurLayers;
     if (CC_LIKELY(mBlurFilter != nullptr)) {
+        int i = 0;
         for (auto layer : layers) {
             if (layer->backgroundBlurRadius > 0) {
+                ALOGI("find backgroundBlurRadius %d\n", i);
                 blurLayers.push_back(layer);
             }
+            i++;
         }
     }
     const auto blurLayersSize = blurLayers.size();
@@ -1176,8 +1179,8 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             Texture texture(Texture::TEXTURE_EXTERNAL, layer->source.buffer.textureName);
             mat4 texMatrix = layer->source.buffer.textureTransform;
 
-            texMatrix[0] *= 2;
-            ALOGI("texMatrix: %f %f %f %f, %f %f %f %f, %f %f %f %f, %f %f %f %f", 
+            ALOGI("layer:%p texMatrix: %f %f %f %f, %f %f %f %f, %f %f %f %f, %f %f %f %f", 
+                layer,
                 texMatrix[0][0], texMatrix[0][1], texMatrix[0][2], texMatrix[0][3], 
                 texMatrix[1][0], texMatrix[1][1], texMatrix[1][2], texMatrix[1][3], 
                 texMatrix[2][0],  texMatrix[2][1], texMatrix[2][2], texMatrix[2][3], 
@@ -1195,6 +1198,8 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             texCoords[2] = vec2(1.0, 1.0);
             texCoords[3] = vec2(1.0, 0.0);
             setupLayerTexturing(texture);   //启用纹理
+        } else {
+            ALOGI("layer:%p source.buffer.buffer is null",  layer);
         }
 
         const half3 solidColor = layer->source.solidColor;
