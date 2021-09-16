@@ -1036,7 +1036,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
         ALOGV("Drawing empty layer stack");
         return NO_ERROR;
     }
-    ALOGI("draw layer count:%lu\n", layers.size());
+    ALOGI("draw layer count:%u\n", layers.size());
     if (bufferFence.get() >= 0) {
         // Duplicate the fence for passing to waitFence.
         base::unique_fd bufferFenceDup(dup(bufferFence.get()));
