@@ -1848,10 +1848,12 @@ void SurfaceFlinger::onMessageReceived(int32_t what, nsecs_t expectedVSyncTime) 
     ATRACE_CALL();
     switch (what) {
         case MessageQueue::INVALIDATE: {
+            AGLOGI("SurfaceFlinger::onMessageReceived MessageQueue::INVALIDATE");
             onMessageInvalidate(expectedVSyncTime);
             break;
         }
         case MessageQueue::REFRESH: {
+            AGLOGI("SurfaceFlinger::onMessageReceived MessageQueue::REFRESH");
             onMessageRefresh();
             break;
         }
