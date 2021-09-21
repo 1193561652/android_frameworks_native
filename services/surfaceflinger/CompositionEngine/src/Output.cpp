@@ -312,10 +312,10 @@ void Output::present(const compositionengine::CompositionRefreshArgs& refreshArg
     updateAndWriteCompositionState(refreshArgs);
     setColorTransform(refreshArgs);
     beginFrame();
-    prepareFrame();
+    prepareFrame();                         //
     devOptRepaintFlash(refreshArgs);
-    finishFrame(refreshArgs);
-    postFramebuffer();
+    finishFrame(refreshArgs);       //opengl draw
+    postFramebuffer();      //draw to HWC
 }
 
 void Output::rebuildLayerStacks(const compositionengine::CompositionRefreshArgs& refreshArgs,
@@ -758,7 +758,7 @@ void Output::prepareFrame() {
         return;
     }
 
-    chooseCompositionStrategy();
+    chooseCompositionStrategy();            //
 
     mRenderSurface->prepareFrame(outputState.usesClientComposition,
                                  outputState.usesDeviceComposition);
@@ -791,8 +791,9 @@ void Output::devOptRepaintFlash(const compositionengine::CompositionRefreshArgs&
 void Output::finishFrame(const compositionengine::CompositionRefreshArgs& refreshArgs) {
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
-
+    ALOGI("Output::finishFrame");
     if (!getState().isEnabled) {
+        ALOGI("Output::finishFrame return with getState().isEnabled is false");
         return;
     }
 
@@ -800,10 +801,12 @@ void Output::finishFrame(const compositionengine::CompositionRefreshArgs& refres
     // the composition completes.
     auto optReadyFence = composeSurfaces(Region::INVALID_REGION, refreshArgs);
     if (!optReadyFence) {
+        ALOGI("Output::finishFrame return with optReadyFence is false");
         return;
     }
 
     // swap buffers (presentation)
+    //class is RenderSurface
     mRenderSurface->queueBuffer(std::move(*optReadyFence));
 }
 
@@ -811,7 +814,7 @@ std::optional<base::unique_fd> Output::composeSurfaces(
         const Region& debugRegion, const compositionengine::CompositionRefreshArgs& refreshArgs) {
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
-
+    ALOGI("Output::composeSurfaces");
     const auto& outputState = getState();
     OutputCompositionState& outputCompositionState = editState();
     const TracedOrdinal<bool> hasClientComposition = {"hasClientComposition",
@@ -851,6 +854,7 @@ std::optional<base::unique_fd> Output::composeSurfaces(
             ALOGW("Dequeuing buffer for display [%s] failed, bailing out of "
                   "client composition for this frame",
                   mName.c_str());
+            ALOGI("Output::composeSurfaces return 1");
             return {};
         }
     }
@@ -858,6 +862,7 @@ std::optional<base::unique_fd> Output::composeSurfaces(
     base::unique_fd readyFence;
     if (!hasClientComposition) {
         setExpensiveRenderingExpected(false);
+        ALOGI("Output::composeSurfaces return 2 hasClientCompositionis false");
         return readyFence;
     }
 
@@ -895,6 +900,7 @@ std::optional<base::unique_fd> Output::composeSurfaces(
                                                    clientCompositionLayers)) {
             outputCompositionState.reusedClientComposition = true;
             setExpensiveRenderingExpected(false);
+            ALOGI("Output::composeSurfaces return 3 mClientCompositionRequestCache->exists(buf->getId(), clientCompositionDisplay, clientCompositionLayers) false");
             return readyFence;
         }
         mClientCompositionRequestCache->add(buf->getId(), clientCompositionDisplay,
@@ -922,8 +928,9 @@ std::optional<base::unique_fd> Output::composeSurfaces(
                    });
 
     const nsecs_t renderEngineStart = systemTime();
+    //GLESEngen draw
     status_t status =
-            renderEngine.drawLayers(clientCompositionDisplay, clientCompositionLayerPointers,
+            renderEngine.drawLayers(clientCompositionDisplay, clientCompositionLayerPointers,   
                                     buf->getNativeBuffer(), /*useFramebufferCache=*/true,
                                     std::move(fd), &readyFence);
 
@@ -1049,7 +1056,7 @@ void Output::postFramebuffer() {
     auto& outputState = editState();
     outputState.dirtyRegion.clear();
     mRenderSurface->flip();
-
+    // 统一通过HWC的绘制到屏幕 Display::presentAndGetFrameFences()
     auto frame = presentAndGetFrameFences();
 
     mRenderSurface->onPresentDisplayCompleted();
@@ -1076,7 +1083,7 @@ void Output::postFramebuffer() {
             releaseFence =
                     Fence::merge("LayerRelease", releaseFence, frame.clientTargetAcquireFence);
         }
-
+        // 设置释放状态的Fence
         layer->getLayerFE().onLayerDisplayed(releaseFence);
     }
 
@@ -1085,6 +1092,7 @@ void Output::postFramebuffer() {
     // supply them with the present fence.
     for (auto& weakLayer : mReleasedLayers) {
         if (auto layer = weakLayer.promote(); layer != nullptr) {
+            // 设置释放状态的Fence
             layer->onLayerDisplayed(frame.presentFence);
         }
     }

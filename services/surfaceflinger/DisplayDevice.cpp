@@ -68,7 +68,7 @@ DisplayDevice::DisplayDevice(DisplayDeviceCreationArgs& args)
                                                                  args.nativeWindow.get()),
                                                          ANativeWindow_getHeight(
                                                                  args.nativeWindow.get()),
-                                                         args.nativeWindow, args.displaySurface});
+                                                         args.nativeWindow, args.displaySurface});       // args.nativeWindow class is Surface
 
     if (!mFlinger->mDisableClientCompositionCache &&
         SurfaceFlinger::maxFrameBufferAcquiredBuffers > 0) {

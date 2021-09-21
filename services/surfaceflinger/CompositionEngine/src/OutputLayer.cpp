@@ -360,7 +360,8 @@ void OutputLayer::writeOutputDependentGeometryStateToHWC(
               outputDependentState.displayFrame.bottom, to_string(error).c_str(),
               static_cast<int32_t>(error));
     }
-
+    ALOGI("OutputLayer::writeOutputDependentGeometryStateToHWC %f %f %f %f",
+        outputDependentState.sourceCrop.left, outputDependentState.sourceCrop.top, outputDependentState.sourceCrop.right, outputDependentState.sourceCrop.bottom);
     if (auto error = hwcLayer->setSourceCrop(outputDependentState.sourceCrop);
         error != hal::Error::NONE) {
         ALOGE("[%s] Failed to set source crop [%.3f, %.3f, %.3f, %.3f]: "

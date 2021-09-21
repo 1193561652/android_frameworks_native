@@ -939,6 +939,7 @@ Error Layer::setSourceCrop(const FloatRect& crop)
 {
     Hwc2::IComposerClient::FRect hwcRect{
         crop.left, crop.top, crop.right, crop.bottom};
+    //ALOGI("Layer::setSourceCrop %f %f %f %f", crop.left, crop.top, crop.right, crop.bottom);
     auto intError = mComposer.setLayerSourceCrop(mDisplayId, mId, hwcRect);
     return static_cast<Error>(intError);
 }

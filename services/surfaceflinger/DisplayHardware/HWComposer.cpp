@@ -584,10 +584,11 @@ status_t HWComposer::presentAndGetReleaseFences(DisplayId displayId) {
         RETURN_IF_HWC_ERROR_FOR("present", displayData.presentError, displayId, UNKNOWN_ERROR);
         return NO_ERROR;
     }
-
+    // 调用Hal层的present方法，进行渲染
     auto error = hwcDisplay->present(&displayData.lastPresentFence);
     RETURN_IF_HWC_ERROR_FOR("present", error, displayId, UNKNOWN_ERROR);
 
+    // getReleaseFences从Hal层中获取释放的Fence
     std::unordered_map<HWC2::Layer*, sp<Fence>> releaseFences;
     error = hwcDisplay->getReleaseFences(&releaseFences);
     RETURN_IF_HWC_ERROR_FOR("getReleaseFences", error, displayId, UNKNOWN_ERROR);

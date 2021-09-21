@@ -893,6 +893,8 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
     }
 
     nsecs_t now = systemTime();
+    // class is BufferQueueProducer
+    //  BufferQueueProducer::queueBuffer
     status_t err = mGraphicBufferProducer->queueBuffer(i, input, &output);
     mLastQueueDuration = systemTime() - now;
     if (err != OK)  {

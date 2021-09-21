@@ -319,12 +319,12 @@ std::string decodeDisplayColorSetting(DisplayColorSetting displayColorSetting) {
 SurfaceFlingerBE::SurfaceFlingerBE() : mHwcServiceName(getHwcServiceName()) {}
 
 SurfaceFlinger::SurfaceFlinger(Factory& factory, SkipInitializationTag)
-      : mFactory(factory),
+      : mFactory(factory),              //class DefaultFactory
         mInterceptor(mFactory.createSurfaceInterceptor(this)),
         mTimeStats(std::make_shared<impl::TimeStats>()),
         mFrameTracer(std::make_unique<FrameTracer>()),
         mEventQueue(mFactory.createMessageQueue()),
-        mCompositionEngine(mFactory.createCompositionEngine()),
+        mCompositionEngine(mFactory.createCompositionEngine()),         //class CompositionEngine
         mInternalDisplayDensity(getDensityFromProperty("ro.sf.lcd_density", true)),
         mEmulatedDisplayDensity(getDensityFromProperty("qemu.sf.lcd_density", false)) {}
 
@@ -2062,7 +2062,7 @@ bool SurfaceFlinger::handleMessageTransaction() {
 
 void SurfaceFlinger::onMessageRefresh() {
     ATRACE_CALL();
-
+    ALOGI("SurfaceFlinger::onMessageRefresh");
     mRefreshPending = false;
 
     compositionengine::CompositionRefreshArgs refreshArgs;
@@ -2551,7 +2551,10 @@ sp<DisplayDevice> SurfaceFlinger::setupNewDisplayDeviceInternal(
                 getHwComposer().getSupportedPerFrameMetadata(*displayId);
     }
 
+    //getFactory() == DefaultFactory
+    //class is NativeWindowSurface
     auto nativeWindowSurface = getFactory().createNativeWindowSurface(producer);
+    //nativeWindow is new Surface(producer, /* controlledByApp */ false)
     auto nativeWindow = nativeWindowSurface->getNativeWindow();
     creationArgs.nativeWindow = nativeWindow;
 
@@ -2567,7 +2570,8 @@ sp<DisplayDevice> SurfaceFlinger::setupNewDisplayDeviceInternal(
 
     // virtual displays are always considered enabled
     creationArgs.initialPowerMode = state.isVirtual() ? hal::PowerMode::ON : hal::PowerMode::OFF;
-
+    // creationArgs.displaySurface is FramebufferSurface
+    // creationArgs.nativeWindow is Surface
     sp<DisplayDevice> display = getFactory().createDisplayDevice(creationArgs);
 
     if (maxFrameBufferAcquiredBuffers >= 3) {

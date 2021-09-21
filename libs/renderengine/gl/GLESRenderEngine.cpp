@@ -1032,6 +1032,7 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
                                       const bool useFramebufferCache, base::unique_fd&& bufferFence,
                                       base::unique_fd* drawFence) {
     ATRACE_CALL();
+    ALOGI("GLESRenderEngine::drawLayers");
     if (layers.empty()) {
         ALOGV("Drawing empty layer stack");
         return NO_ERROR;

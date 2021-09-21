@@ -91,7 +91,7 @@ nsecs_t CompositionEngine::getLastFrameRefreshTimestamp() const {
 void CompositionEngine::present(CompositionRefreshArgs& args) {
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
-
+    ALOGI("CompositionEngine::present");
     preComposition(args);       //处理显示设备与 layers 的改变，更新光标
 
     {
@@ -101,13 +101,15 @@ void CompositionEngine::present(CompositionRefreshArgs& args) {
         LayerFESet latchedLayers;
 
         for (const auto& output : args.outputs) {
+            // output class is Display
             output->prepare(args, latchedLayers);
         }
     }
 
     updateLayerStateFromFE(args);
-
+    int i = 0;
     for (const auto& output : args.outputs) {
+        ALOGI("call output->present %d", i++);
         output->present(args);
     }
 }
