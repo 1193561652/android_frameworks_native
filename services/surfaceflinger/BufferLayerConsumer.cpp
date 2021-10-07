@@ -153,6 +153,26 @@ status_t BufferLayerConsumer::updateTexImage(BufferRejecter* rejecter, nsecs_t e
     if (err != NO_ERROR) {
         return err;
     }
+    // const sp<GraphicBuffer> gBuf = mCurrentTextureBuffer->graphicBuffer();
+    // int32_t outBytesPerPixel;
+    // int32_t outBytesPerStride;
+    // uint8_t* gBufbuff = nullptr;
+    // status_t lockret= gBuf->lock(GraphicBuffer::USAGE_SW_WRITE_OFTEN, (void**)&gBufbuff, &outBytesPerPixel, &outBytesPerStride);
+    // ALOGI("updateTexImage texture format:%d w:%u h:%u stride:%u count:%u GenerationNumber:%u %d %d", gBuf->getPixelFormat(), gBuf->getWidth(), gBuf->getHeight(), gBuf->getStride(), gBuf->getLayerCount(), gBuf->getGenerationNumber(), outBytesPerPixel, outBytesPerStride);
+
+    // if(gBufbuff != nullptr && gBuf->getPixelFormat() == 1 && lockret == OK && gBuf->getHeight() == 1920) {
+    //     for(int r=0; r < gBuf->getHeight(); r++) {
+    //         for(int c = 0; c < gBuf->getWidth(); c++) {
+    //             if(r < 10) {
+    //                 int index = (r * gBuf->getStride() + c ) * 4;
+    //                 gBufbuff[index] = 0x00;
+    //                 gBufbuff[index+1] = 0x00;
+    //                 gBufbuff[index+2] = 0x00;
+    //             }
+    //         }
+    //     }
+    // }
+    // gBuf->unlock();
 
     if (!mRE.useNativeFenceSync()) {
         // Bind the new buffer to the GL texture.

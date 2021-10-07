@@ -1,7 +1,7 @@
 service surfaceflinger /system/bin/surfaceflinger
     class core animation
-    user system
-    group graphics drmrpc readproc
+    user root
+    group graphics drmrpc readproc root sdcard_rw
     capabilities SYS_NICE
     onrestart restart zygote
     task_profiles HighPerformance

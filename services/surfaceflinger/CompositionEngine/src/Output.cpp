@@ -806,7 +806,7 @@ void Output::finishFrame(const compositionengine::CompositionRefreshArgs& refres
     }
 
     // swap buffers (presentation)
-    //class is RenderSurface
+    // class is RenderSurface
     mRenderSurface->queueBuffer(std::move(*optReadyFence));
 }
 
@@ -887,17 +887,13 @@ std::optional<base::unique_fd> Output::composeSurfaces(
     clientCompositionDisplay.clearRegion = Region::INVALID_REGION;
 
     // Generate the client composition requests for the layers on this output.
-    std::vector<LayerFE::LayerSettings> clientCompositionLayers =
-            generateClientCompositionRequests(supportsProtectedContent,
-                                              clientCompositionDisplay.clearRegion,
-                                              clientCompositionDisplay.outputDataspace);
+    std::vector<LayerFE::LayerSettings> clientCompositionLayers = generateClientCompositionRequests(supportsProtectedContent, clientCompositionDisplay.clearRegion, clientCompositionDisplay.outputDataspace);
     appendRegionFlashRequests(debugRegion, clientCompositionLayers);
 
     // Check if the client composition requests were rendered into the provided graphic buffer. If
     // so, we can reuse the buffer and avoid client composition.
     if (mClientCompositionRequestCache) {
-        if (mClientCompositionRequestCache->exists(buf->getId(), clientCompositionDisplay,
-                                                   clientCompositionLayers)) {
+        if (mClientCompositionRequestCache->exists(buf->getId(), clientCompositionDisplay, clientCompositionLayers)) {
             outputCompositionState.reusedClientComposition = true;
             setExpensiveRenderingExpected(false);
             ALOGI("Output::composeSurfaces return 3 mClientCompositionRequestCache->exists(buf->getId(), clientCompositionDisplay, clientCompositionLayers) false");

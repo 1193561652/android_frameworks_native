@@ -485,6 +485,7 @@ protected:
     void* mQueryInterceptorData = nullptr;
 
     // must be used from the lock/unlock thread
+    uint8_t* mLockedBufferAddr = nullptr;
     sp<GraphicBuffer>           mLockedBuffer;
     sp<GraphicBuffer>           mPostedBuffer;
     bool                        mConnectedToCpu;

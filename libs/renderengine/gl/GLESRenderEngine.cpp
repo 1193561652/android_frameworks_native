@@ -1180,6 +1180,40 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
             Texture texture(Texture::TEXTURE_EXTERNAL, layer->source.buffer.textureName);
             mat4 texMatrix = layer->source.buffer.textureTransform;
 
+            // FILE* file = nullptr;
+            // static bool first = true;
+            // if(first) {
+            //     first = false;
+            //     file = fopen("/test.bmp", "w+");
+            //     ALOGI("open /test.bmp file %p", file);
+            // }
+            // ALOGI("open file before");
+            // int fd = open("/mnt/sdcard/test.bmp",  O_RDWR| O_CREAT, 600);
+            // ALOGI("open file after %d %d", fd, errno);
+            // uint8_t* gBufbuff = nullptr;
+            // ALOGI("usage:%lu", (unsigned long)gBuf->getUsage());
+            // status_t lockret= gBuf->lock(GraphicBuffer::USAGE_SW_WRITE_OFTEN, (void**)&gBufbuff);
+            // ALOGI("texture format:%d w:%u h:%u buff:%p stride:%u lockret:%d count:%u GenerationNumber:%u", gBuf->getPixelFormat(), gBuf->getWidth(), gBuf->getHeight(), gBufbuff, gBuf->getStride(), lockret, gBuf->getLayerCount(), gBuf->getGenerationNumber());
+            // if(file)
+            //     fwrite(gBufbuff, 1, gBuf->getWidth() * gBuf->getHeight() * 4, file);
+            // if(gBufbuff != nullptr && gBuf->getPixelFormat() == 1) {
+            //     for(int r=0; r < gBuf->getHeight(); r++) {
+            //         for(int c = 0; c < gBuf->getWidth(); c++) {
+            //             if(r < 100 && c < 100) {
+            //                 int index = (c * gBuf->getStride() + r ) * 4;
+            //                 gBufbuff[index] = 0x00;
+            //                 gBufbuff[index+1] = 0x00;
+            //                 gBufbuff[index+2] = 0x00;
+            //             }
+            //         }
+            //     }
+            // }
+            //gBuf->unlock();
+            // if(fd)
+            //     close(fd);
+
+            
+            
             ALOGI("layer:%p texMatrix: %f %f %f %f, %f %f %f %f, %f %f %f %f, %f %f %f %f", 
                 layer,
                 texMatrix[0][0], texMatrix[0][1], texMatrix[0][2], texMatrix[0][3], 

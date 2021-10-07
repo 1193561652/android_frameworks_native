@@ -788,6 +788,7 @@ int Surface::lockBuffer_DEPRECATED(android_native_buffer_t* buffer __attribute__
 int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
     ATRACE_CALL();
     ALOGV("Surface::queueBuffer");
+    ALOGI("Surface::queueBuffer");
     Mutex::Autolock lock(mMutex);
     int64_t timestamp;
     bool isAutoTimestamp = false;
@@ -813,8 +814,7 @@ int Surface::queueBuffer(android_native_buffer_t* buffer, int fenceFd) {
         }
         return OK;
     }
-
-
+    
     // Make sure the crop rectangle is entirely inside the buffer.
     Rect crop(Rect::EMPTY_RECT);
     mCrop.intersect(Rect(buffer->width, buffer->height), &crop);
@@ -2141,6 +2141,7 @@ status_t Surface::lock(
             err = INVALID_OPERATION;
         } else {
             mLockedBuffer = backBuffer;
+            mLockedBufferAddr = (uint8_t*)vaddr;
             outBuffer->width  = backBuffer->width;
             outBuffer->height = backBuffer->height;
             outBuffer->stride = backBuffer->stride;
@@ -2157,6 +2158,21 @@ status_t Surface::unlockAndPost()
         ALOGE("Surface::unlockAndPost failed, no locked buffer");
         return INVALID_OPERATION;
     }
+    sp<GraphicBuffer> gBuf = mLockedBuffer;
+    ALOGI("Surface::queueBuffer format:%d w:%u h:%u stride:%u count:%u GenerationNumber:%u addr:%p", gBuf->getPixelFormat(), gBuf->getWidth(), gBuf->getHeight(), gBuf->getStride(), gBuf->getLayerCount(), gBuf->getGenerationNumber(), mLockedBufferAddr);
+
+    if(mLockedBufferAddr != nullptr && gBuf->getPixelFormat() == 1 && gBuf->getHeight() == 1920) {
+        for(uint32_t r=0; r < gBuf->getHeight(); r++) {
+            for(uint32_t c = 0; c < gBuf->getWidth(); c++) {
+                if(r < 100 && c < 100) {
+                    int index = (c * gBuf->getStride() + r ) * 4;
+                    mLockedBufferAddr[index] = 0x00;
+                    mLockedBufferAddr[index+1] = 0x00;
+                    mLockedBufferAddr[index+2] = 0x00;
+                }
+            }
+        }
+    }
 
     int fd = -1;
     status_t err = mLockedBuffer->unlockAsync(&fd);
@@ -2168,6 +2184,7 @@ status_t Surface::unlockAndPost()
 
     mPostedBuffer = mLockedBuffer;
     mLockedBuffer = nullptr;
+    mLockedBufferAddr = nullptr;
     return err;
 }
 
