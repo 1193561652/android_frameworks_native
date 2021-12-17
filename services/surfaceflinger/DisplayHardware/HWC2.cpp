@@ -785,9 +785,8 @@ Error Layer::setBuffer(uint32_t slot, const sp<GraphicBuffer>& buffer,
     }
     mBufferSlot = slot;
 
-    int32_t fenceFd = acquireFence->dup();
-    auto intError = mComposer.setLayerBuffer(mDisplayId, mId, slot, buffer,
-                                             fenceFd);
+    int32_t fenceFd = acquireFence->dup();          //等待buffer就绪
+    auto intError = mComposer.setLayerBuffer(mDisplayId, mId, slot, buffer, fenceFd);   //设置buffer
     return static_cast<Error>(intError);
 }
 

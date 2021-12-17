@@ -309,7 +309,7 @@ void Output::present(const compositionengine::CompositionRefreshArgs& refreshArg
     ALOGV(__FUNCTION__);
 
     updateColorProfile(refreshArgs);
-    updateAndWriteCompositionState(refreshArgs);
+    updateAndWriteCompositionState(refreshArgs);        //更新hwc图层属性
     setColorTransform(refreshArgs);
     beginFrame();
     prepareFrame();                         //

@@ -536,6 +536,7 @@ void Layer::preparePerFrameCompositionState() {
 
     // Force client composition for special cases known only to the front-end.
     if (isHdrY410() || usesRoundedCorners || drawShadows()) {
+        // YUV410颜色空间 || 绘制阴影 || 圆形图标?
         compositionState->forceClientComposition = true;
     }
 }

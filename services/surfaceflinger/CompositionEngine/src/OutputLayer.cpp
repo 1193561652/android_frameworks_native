@@ -293,6 +293,7 @@ void OutputLayer::updateCompositionState(
 
         if ((layerFEState->isSecure && !outputState.isSecure) ||
             (state.bufferTransform & ui::Transform::ROT_INVALID)) {
+                //颜色需要转换
             state.forceClientComposition = true;
         }
     }
@@ -340,7 +341,7 @@ void OutputLayer::writeStateToHWC(bool includeGeometry) {
     }
 
     writeOutputDependentPerFrameStateToHWC(hwcLayer.get());
-    writeOutputIndependentPerFrameStateToHWC(hwcLayer.get(), *outputIndependentState);
+    writeOutputIndependentPerFrameStateToHWC(hwcLayer.get(), *outputIndependentState);      //设置硬件输出buffer
 
     writeCompositionTypeToHWC(hwcLayer.get(), requestedCompositionType);
 
@@ -477,7 +478,7 @@ void OutputLayer::writeOutputIndependentPerFrameStateToHWC(
             break;
         case hal::Composition::CURSOR:
         case hal::Composition::DEVICE:
-            writeBufferStateToHWC(hwcLayer, outputIndependentState);
+            writeBufferStateToHWC(hwcLayer, outputIndependentState);            //设置硬件输出buffer
             break;
         case hal::Composition::INVALID:
         case hal::Composition::CLIENT:

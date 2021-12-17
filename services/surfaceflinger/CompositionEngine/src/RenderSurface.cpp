@@ -191,9 +191,7 @@ void RenderSurface::queueBuffer(base::unique_fd readyFence) {
         if (mGraphicBuffer == nullptr) {
             ALOGE("No buffer is ready for display [%s]", mDisplay.getName().c_str());
         } else {
-            status_t result =
-                    mNativeWindow->queueBuffer(mNativeWindow.get(),
-                                               mGraphicBuffer->getNativeBuffer(), dup(readyFence));
+            status_t result = mNativeWindow->queueBuffer(mNativeWindow.get(), mGraphicBuffer->getNativeBuffer(), dup(readyFence));
             if (result != NO_ERROR) {
                 ALOGE("Error when queueing buffer for display [%s]: %d", mDisplay.getName().c_str(),
                       result);

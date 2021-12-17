@@ -345,7 +345,7 @@ status_t BufferQueueLayer::updateActiveBuffer() {
     // update the active buffer
     mPreviousBufferId = getCurrentBufferId();
     mBufferInfo.mBuffer =
-            mConsumer->getCurrentBuffer(&mBufferInfo.mBufferSlot, &mBufferInfo.mFence);
+            mConsumer->getCurrentBuffer(&mBufferInfo.mBufferSlot, &mBufferInfo.mFence);     //获取buffer，后续交给layerFE，再后续交给hwccache，再交给hwc
 
     if (mBufferInfo.mBuffer == nullptr) {
         // this can only happen if the very first buffer was rejected.

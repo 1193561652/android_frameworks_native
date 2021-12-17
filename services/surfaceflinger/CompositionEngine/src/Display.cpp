@@ -264,8 +264,8 @@ void Display::chooseCompositionStrategy() {
 
     // Determine what type of composition we are doing from the final state
     auto& state = editState();
-    state.usesClientComposition = anyLayersRequireClientComposition();
-    state.usesDeviceComposition = !allLayersRequireClientComposition();
+    state.usesClientComposition = anyLayersRequireClientComposition();      //使用client方式合成
+    state.usesDeviceComposition = !allLayersRequireClientComposition();     //使用device方式合成
 }
 
 bool Display::getSkipColorTransform() const {
