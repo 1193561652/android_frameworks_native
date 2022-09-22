@@ -43,10 +43,10 @@ public:
     ~Transform();
 
     enum RotationFlags : uint32_t {
-        ROT_0 = 0,
-        FLIP_H = HAL_TRANSFORM_FLIP_H,
-        FLIP_V = HAL_TRANSFORM_FLIP_V,
-        ROT_90 = HAL_TRANSFORM_ROT_90,
+        ROT_0 = 0,                          // 旋转0度
+        FLIP_H = HAL_TRANSFORM_FLIP_H,      // 水平翻转
+        FLIP_V = HAL_TRANSFORM_FLIP_V,      // 垂直翻转
+        ROT_90 = HAL_TRANSFORM_ROT_90,      // 旋转
         ROT_180 = FLIP_H | FLIP_V,
         ROT_270 = ROT_180 | ROT_90,
         ROT_INVALID = 0x80

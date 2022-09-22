@@ -101,14 +101,14 @@ void CompositionEngine::present(CompositionRefreshArgs& args) {
         LayerFESet latchedLayers;
 
         for (const auto& output : args.outputs) {
-            output->prepare(args, latchedLayers);
+            output->prepare(args, latchedLayers);       // display output -> prepare();
         }
     }
 
     updateLayerStateFromFE(args);
 
     for (const auto& output : args.outputs) {
-        output->present(args);
+        output->present(args);      // 提交显示
     }
 }
 
@@ -132,7 +132,7 @@ void CompositionEngine::preComposition(CompositionRefreshArgs& args) {
     ALOGV(__FUNCTION__);
 
     bool needsAnotherUpdate = false;
-
+    // 获取时间
     mRefreshStartTime = systemTime(SYSTEM_TIME_MONOTONIC);
 
     for (auto& layer : args.layers) {
@@ -140,7 +140,7 @@ void CompositionEngine::preComposition(CompositionRefreshArgs& args) {
             needsAnotherUpdate = true;
         }
     }
-
+    // 需要其他的更新
     mNeedsAnotherUpdate = needsAnotherUpdate;
 }
 

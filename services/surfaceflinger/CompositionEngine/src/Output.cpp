@@ -301,7 +301,7 @@ void Output::prepare(const compositionengine::CompositionRefreshArgs& refreshArg
     ATRACE_CALL();
     ALOGV(__FUNCTION__);
 
-    rebuildLayerStacks(refreshArgs, geomSnapshots);
+    rebuildLayerStacks(refreshArgs, geomSnapshots); // 重建 layer 栈
 }
 
 void Output::present(const compositionengine::CompositionRefreshArgs& refreshArgs) {
@@ -309,12 +309,12 @@ void Output::present(const compositionengine::CompositionRefreshArgs& refreshArg
     ALOGV(__FUNCTION__);
 
     updateColorProfile(refreshArgs);
-    updateAndWriteCompositionState(refreshArgs);
-    setColorTransform(refreshArgs);
+    updateAndWriteCompositionState(refreshArgs);    // 设置 CompositionState
+    setColorTransform(refreshArgs);                 // 设置颜色矩阵
     beginFrame();
     prepareFrame();
     devOptRepaintFlash(refreshArgs);
-    finishFrame(refreshArgs);
+    finishFrame(refreshArgs);                       // opengl渲染
     postFramebuffer();
 }
 
@@ -332,7 +332,7 @@ void Output::rebuildLayerStacks(const compositionengine::CompositionRefreshArgs&
 
     // Process the layers to determine visibility and coverage
     compositionengine::Output::CoverageState coverage{layerFESet};
-    collectVisibleLayers(refreshArgs, coverage);
+    collectVisibleLayers(refreshArgs, coverage);    // 收集可见区域
 
     // Compute the resulting coverage for this output, and store it for later
     const ui::Transform& tr = outputState.transform;
@@ -361,6 +361,7 @@ void Output::collectVisibleLayers(const compositionengine::CompositionRefreshArg
     finalizePendingOutputLayers();
 
     // Generate a simple Z-order values to each visible output layer
+    // 重排z序
     uint32_t zOrder = 0;
     for (auto* outputLayer : getOutputLayersOrderedByZ()) {
         outputLayer->editState().z = zOrder++;
@@ -583,7 +584,7 @@ void Output::updateAndWriteCompositionState(
     }
 
     mLayerRequestingBackgroundBlur = findLayerRequestingBackgroundComposition();
-    bool forceClientComposition = mLayerRequestingBackgroundBlur != nullptr;
+    bool forceClientComposition = mLayerRequestingBackgroundBlur != nullptr;    // 有背景模糊，强制client渲染
 
     for (auto* layer : getOutputLayersOrderedByZ()) {
         layer->updateCompositionState(refreshArgs.updatingGeometryThisFrame,
@@ -592,10 +593,11 @@ void Output::updateAndWriteCompositionState(
                                       refreshArgs.internalDisplayRotationFlags);
 
         if (mLayerRequestingBackgroundBlur == layer) {
-            forceClientComposition = false;
+            forceClientComposition = false;     // 有背景模糊层以上的层，关闭强制渲染
         }
 
         // Send the updated state to the HWC, if appropriate.
+        // 设置client模式 OutLayer -> HWCLayer
         layer->writeStateToHWC(refreshArgs.updatingGeometryThisFrame);
     }
 }
@@ -882,6 +884,7 @@ std::optional<base::unique_fd> Output::composeSurfaces(
     clientCompositionDisplay.clearRegion = Region::INVALID_REGION;
 
     // Generate the client composition requests for the layers on this output.
+    // 获取client模式layer
     std::vector<LayerFE::LayerSettings> clientCompositionLayers =
             generateClientCompositionRequests(supportsProtectedContent,
                                               clientCompositionDisplay.clearRegion,

@@ -286,13 +286,13 @@ void OutputLayer::updateCompositionState(
         // go away otherwise.
         state.forceClientComposition = false;
 
-        state.displayFrame = calculateOutputDisplayFrame();
-        state.sourceCrop = calculateOutputSourceCrop();
+        state.displayFrame = calculateOutputDisplayFrame();     // 计算显示区域
+        state.sourceCrop = calculateOutputSourceCrop();         // 计算裁剪区域
         state.bufferTransform = static_cast<Hwc2::Transform>(
-                calculateOutputRelativeBufferTransform(internalDisplayRotationFlags));
+                calculateOutputRelativeBufferTransform(internalDisplayRotationFlags));  // 计算相对transform?
 
-        if ((layerFEState->isSecure && !outputState.isSecure) ||
-            (state.bufferTransform & ui::Transform::ROT_INVALID)) {
+        if ((layerFEState->isSecure && !outputState.isSecure) ||    // 非安全->安全?
+            (state.bufferTransform & ui::Transform::ROT_INVALID)) { // 旋转无效?
             state.forceClientComposition = true;
         }
     }
@@ -309,6 +309,7 @@ void OutputLayer::updateCompositionState(
     // time.
     if (layerFEState->forceClientComposition || !profile.isDataspaceSupported(state.dataspace) ||
         forceClientComposition) {
+        // 如果开启强制client渲染，或者layer需要client渲染，或者dataspace不支持，则决定client渲染
         state.forceClientComposition = true;
     }
 }
@@ -545,6 +546,7 @@ void OutputLayer::writeCompositionTypeToHWC(HWC2::Layer* hwcLayer,
 
     // If we are forcing client composition, we need to tell the HWC
     if (outputDependentState.forceClientComposition) {
+        // 
         requestedCompositionType = hal::Composition::CLIENT;
     }
 

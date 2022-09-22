@@ -384,7 +384,7 @@ private:
         }
 
         const LayerVector::StateSet stateSet = LayerVector::StateSet::Invalid;
-        LayerVector layersSortedByZ;
+        LayerVector layersSortedByZ;    // z序 layer
         DefaultKeyedVector< wp<IBinder>, DisplayDeviceState> displays;
 
         bool colorMatrixChanged = true;

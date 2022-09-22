@@ -300,12 +300,15 @@ uint32_t Transform::type() const
         bool scale = false;
         uint32_t flags = ROT_0;
         if (isZero(b) && isZero(c)) {
+            // 无旋转
             if (a<0)    flags |= FLIP_H;
             if (d<0)    flags |= FLIP_V;
             if (!absIsOne(a) || !absIsOne(d)) {
+                // x或y缩放
                 scale = true;
             }
         } else if (isZero(a) && isZero(d)) {
+            // 无缩放
             flags |= ROT_90;
             if (b>0)    flags |= FLIP_V;
             if (c<0)    flags |= FLIP_H;

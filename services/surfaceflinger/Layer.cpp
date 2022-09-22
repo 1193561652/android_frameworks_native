@@ -535,6 +535,7 @@ void Layer::preparePerFrameCompositionState() {
             isOpaque(drawingState) && !usesRoundedCorners && getAlpha() == 1.0_hf;
 
     // Force client composition for special cases known only to the front-end.
+    // 颜色空间为Y410,或者我使用圆心光标,或者绘制阴影
     if (isHdrY410() || usesRoundedCorners || drawShadows()) {
         compositionState->forceClientComposition = true;
     }
@@ -586,11 +587,11 @@ void Layer::prepareCompositionState(compositionengine::LayerFE::StateSubset subs
         case StateSubset::GeometryAndContent:
             prepareBasicGeometryCompositionState();
             prepareGeometryCompositionState();
-            preparePerFrameCompositionState();
+            preparePerFrameCompositionState();  // 判断是否强制client渲染
             break;
 
         case StateSubset::Content:
-            preparePerFrameCompositionState();
+            preparePerFrameCompositionState();  // 判断是否强制client渲染
             break;
 
         case StateSubset::Cursor:

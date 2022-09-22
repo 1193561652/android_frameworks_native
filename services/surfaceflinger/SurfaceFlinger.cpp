@@ -1844,11 +1844,11 @@ void SurfaceFlinger::onMessageReceived(int32_t what, nsecs_t expectedVSyncTime) 
     ATRACE_CALL();
     switch (what) {
         case MessageQueue::INVALIDATE: {
-            onMessageInvalidate(expectedVSyncTime);
+            onMessageInvalidate(expectedVSyncTime);     // 区域刷新
             break;
         }
         case MessageQueue::REFRESH: {
-            onMessageRefresh();
+            onMessageRefresh(); // 全局刷新
             break;
         }
     }
@@ -2060,15 +2060,23 @@ void SurfaceFlinger::onMessageRefresh() {
     mRefreshPending = false;
 
     compositionengine::CompositionRefreshArgs refreshArgs;
-    const auto& displays = ON_MAIN_THREAD(mDisplays);
+    const auto& displays = ON_MAIN_THREAD(mDisplays);       // 从主线程获取 mDisplays, 不是主线程则异常
     refreshArgs.outputs.reserve(displays.size());
+    // 遍历 display
     for (const auto& [_, display] : displays) {
+        // DisplayDevice::getCompositionDisplay()
+        // compositionengine::Display extened Output
         refreshArgs.outputs.push_back(display->getCompositionDisplay());
     }
+
+    // 遍历 drawingState, 根据z序遍历
+    // Layer EffectLayer BufferLayer BufferStateLayer BufferQueueLayer 
     mDrawingState.traverseInZOrder([&refreshArgs](Layer* layer) {
         if (auto layerFE = layer->getCompositionEngineLayerFE())
             refreshArgs.layers.push_back(layerFE);
     });
+
+    // 遍历 layersWithQueuedFrames
     refreshArgs.layersWithQueuedFrames.reserve(mLayersWithQueuedFrames.size());
     for (sp<Layer> layer : mLayersWithQueuedFrames) {
         if (auto layerFE = layer->getCompositionEngineLayerFE())
@@ -2105,7 +2113,7 @@ void SurfaceFlinger::onMessageRefresh() {
     // the scheduler.
     const auto presentTime = systemTime();
 
-    mCompositionEngine->present(refreshArgs);
+    mCompositionEngine->present(refreshArgs);   // 绘制
     mTimeStats->recordFrameDuration(mFrameStartTime, systemTime());
     // Reset the frame start time now that we've recorded this frame.
     mFrameStartTime = 0;
