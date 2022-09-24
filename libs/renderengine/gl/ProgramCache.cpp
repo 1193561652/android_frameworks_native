@@ -186,6 +186,8 @@ ProgramCache::Key ProgramCache::computeKey(const Description& description) {
     needs.set(Key::Y410_BT2020_MASK,
               description.isY410BT2020 ? Key::Y410_BT2020_ON : Key::Y410_BT2020_OFF);
 
+    needs.set(Key::BAT_MASK, description.exttextureEnabled?Key::BAT_ON:Key::BAT_OFF);
+
     if (needs.hasTransformMatrix() ||
         (description.inputTransferFunction != description.outputTransferFunction)) {
         switch (description.inputTransferFunction) {
@@ -564,6 +566,7 @@ String8 ProgramCache::generateVertexShader(const Key& needs) {
         vs << "attribute lowp vec4 shadowParams;";
         vs << "varying lowp vec3 outShadowParams;";
     }
+    
     vs << "attribute vec4 position;"
        << "uniform mat4 projection;"
        << "uniform mat4 texture;"
@@ -578,6 +581,7 @@ String8 ProgramCache::generateVertexShader(const Key& needs) {
         vs << "outShadowColor = shadowColor;";
         vs << "outShadowParams = shadowParams.xyz;";
     }
+    
     vs << dedent << "}";
     return vs.getString();
 }
@@ -595,6 +599,10 @@ String8 ProgramCache::generateFragmentShader(const Key& needs) {
         fs << "uniform samplerExternalOES sampler;";
     } else if (needs.getTextureTarget() == Key::TEXTURE_2D) {
         fs << "uniform sampler2D sampler;";
+    }
+
+    if (needs.hasBat()) {
+        vs << "uniform sampler2D extsampler;"
     }
 
     if (needs.hasTextureCoords()) {

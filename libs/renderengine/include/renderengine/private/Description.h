@@ -60,6 +60,9 @@ struct Description {
     Texture texture;
     bool textureEnabled = false;
 
+    Texture exttexture;
+    bool exttextureEnabled = false;
+
     // color used when texturing is disabled or when setting alpha.
     half4 color;
 

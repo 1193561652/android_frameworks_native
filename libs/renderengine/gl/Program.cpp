@@ -65,6 +65,7 @@ Program::Program(const ProgramCache::Key& /*needs*/, const char* vertex, const c
         mProjectionMatrixLoc = glGetUniformLocation(programId, "projection");
         mTextureMatrixLoc = glGetUniformLocation(programId, "texture");
         mSamplerLoc = glGetUniformLocation(programId, "sampler");
+        mExtSamplerLoc = glGetUniformLocation(programId, "extsampler");
         mColorLoc = glGetUniformLocation(programId, "color");
         mDisplayMaxLuminanceLoc = glGetUniformLocation(programId, "displayMaxLuminance");
         mMaxMasteringLuminanceLoc = glGetUniformLocation(programId, "maxMasteringLuminance");
@@ -124,7 +125,13 @@ void Program::setUniforms(const Description& desc) {
     if (mSamplerLoc >= 0) {
         glUniform1i(mSamplerLoc, 0);
         glUniformMatrix4fv(mTextureMatrixLoc, 1, GL_FALSE, desc.texture.getMatrix().asArray());
+        // ALOGE("BAT desc.texture.getTextureName():%d", desc.texture.getTextureName());
     }
+
+    // if (mExtSamplerLoc >= 0) {
+    //     glUniform1i(mExtSamplerLoc, 0);
+    // }
+
     if (mColorLoc >= 0) {
         const float color[4] = {desc.color.r, desc.color.g, desc.color.b, desc.color.a};
         glUniform4fv(mColorLoc, 1, color);

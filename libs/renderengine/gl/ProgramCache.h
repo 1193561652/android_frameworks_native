@@ -117,6 +117,11 @@ public:
             SHADOW_MASK = 1 << SHADOW_SHIFT,
             SHADOW_OFF = 0 << SHADOW_SHIFT,
             SHADOW_ON = 1 << SHADOW_SHIFT,
+
+            BAT_SHIFT = 14,
+            BAT_MASK = 1 << BAT_SHIFT,
+            BAT_OFF = 0 << BAT_SHIFT,
+            BAT_ON = 1 << BAT_SHIFT,
         };
 
         inline Key() : mKey(0) {}
@@ -145,6 +150,9 @@ public:
         }
         inline bool hasTransformMatrix() const {
             return hasInputTransformMatrix() || hasOutputTransformMatrix();
+        }
+        inline bool hasBat() const {
+            return (mKey & BAT_MASK) == BAT_ON;
         }
         inline int getInputTF() const { return (mKey & INPUT_TF_MASK); }
         inline int getOutputTF() const { return (mKey & OUTPUT_TF_MASK); }

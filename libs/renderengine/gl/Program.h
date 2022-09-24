@@ -91,6 +91,9 @@ private:
     /* location of the sampler uniform */
     GLint mSamplerLoc;
 
+    /**/
+    GLint mExtSamplerLoc;
+
     /* location of the color uniform */
     GLint mColorLoc;
 

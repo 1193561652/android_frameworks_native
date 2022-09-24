@@ -1298,6 +1298,7 @@ void GLESRenderEngine::setDisplayMaxLuminance(const float maxLuminance) {
 
 void GLESRenderEngine::setupLayerTexturing(const Texture& texture) {
     GLuint target = texture.getTextureTarget();
+    // Texture::TEXTURE_2D, id
     glBindTexture(target, texture.getTextureName());
     GLenum filter = GL_NEAREST;
     if (texture.getFiltering()) {
