@@ -29,7 +29,7 @@ namespace gl {
 
 GLShadowTexture::GLShadowTexture() {
     fillShadowTextureData(mTextureData, SHADOW_TEXTURE_WIDTH);
-
+    glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &mName);
     glBindTexture(GL_TEXTURE_2D, mName);
     glTexImage2D(GL_TEXTURE_2D, 0 /* base image level */, GL_ALPHA, SHADOW_TEXTURE_WIDTH,

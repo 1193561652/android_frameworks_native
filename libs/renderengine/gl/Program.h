@@ -94,6 +94,8 @@ private:
     /**/
     GLint mExtIndex;
 
+    GLint mExtSamplerLoc;
+
     /* location of the color uniform */
     GLint mColorLoc;
 

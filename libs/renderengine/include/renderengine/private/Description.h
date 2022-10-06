@@ -59,6 +59,10 @@ struct Description {
     // Texture this layer uses
     Texture texture;
     bool textureEnabled = false;
+    
+    // BAT
+    Texture extTexture;
+    bool extTextureEnabled = false;
 
     // color used when texturing is disabled or when setting alpha.
     half4 color;

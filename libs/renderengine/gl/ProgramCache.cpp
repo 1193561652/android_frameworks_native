@@ -603,7 +603,9 @@ String8 ProgramCache::generateFragmentShader(const Key& needs) {
     } else if (needs.getTextureTarget() == Key::TEXTURE_2D) {
         fs << "uniform sampler2D sampler;";
     }
-
+#ifdef BAT
+    fs << "uniform sampler2D extsampler;";
+#endif
     if (needs.hasTextureCoords()) {
         fs << "varying vec2 outTexCoords;";
     }
@@ -723,7 +725,11 @@ String8 ProgramCache::generateFragmentShader(const Key& needs) {
         if (needs.isTexturing()) {
             fs << "gl_FragColor = texture2D(sampler, outTexCoords);";
 #ifdef BAT
-            fs << "if(outTexCoords.x >= extIndex && outTexCoords.x <= extIndex+0.1 && extIndex > 0.0 && extIndex < 1.0) {gl_FragColor.r = 0.0; gl_FragColor.g = 0.0; gl_FragColor.b = 0.0; gl_FragColor.a = 1.0;}";
+            fs << "if (extIndex<1.0) {";
+            fs << "    vec4 extclor = texture2D(extsampler, outTexCoords);";
+            fs << "    if (extclor.a > 0.0) gl_FragColor = extclor;";
+            fs << "}";
+            // fs << "if(outTexCoords.x >= extIndex && outTexCoords.x <= extIndex+0.1 && extIndex > 0.0 && extIndex < 1.0) {gl_FragColor.r = 0.0; gl_FragColor.g = 0.0; gl_FragColor.b = 0.0; gl_FragColor.a = 1.0;}";
 #endif
             if (needs.isY410BT2020()) {
                 fs << "gl_FragColor.rgb = convertY410BT2020(gl_FragColor.rgb);";

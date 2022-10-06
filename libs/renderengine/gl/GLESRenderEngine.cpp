@@ -1156,6 +1156,12 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
         mState.maxContentLuminance = layer->source.buffer.maxContentLuminance;
         mState.projectionMatrix = projectionMatrix * layer->geometry.positionTransform;
         mState.extIndex = (float)(layer->index);
+        if (buildExtTexture((float)(layer->index))) {
+            setupLayerExtTexturing(mExtTexture.getTexture());
+        } else {
+            mState.extTextureEnabled = false;
+        }
+
         const FloatRect bounds = layer->geometry.boundaries;
         Mesh::VertexArray<vec2> position(mesh.getPositionArray<vec2>());
         position[0] = vec2(bounds.left, bounds.top);
@@ -1253,6 +1259,15 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
     return NO_ERROR;
 }
 
+bool GLESRenderEngine::buildExtTexture(float index) {
+    if (index <1.0f) {
+        return mExtTexture.reload(index * 100);
+    } else {
+
+    }
+    return false;
+}
+
 void GLESRenderEngine::setViewportAndProjection(Rect viewport, Rect clip) {
     ATRACE_CALL();
     mVpWidth = viewport.getWidth();
@@ -1301,6 +1316,7 @@ void GLESRenderEngine::setDisplayMaxLuminance(const float maxLuminance) {
 }
 
 void GLESRenderEngine::setupLayerTexturing(const Texture& texture) {
+    glActiveTexture(GL_TEXTURE0);
     GLuint target = texture.getTextureTarget();
     glBindTexture(target, texture.getTextureName());
     GLenum filter = GL_NEAREST;
@@ -1314,6 +1330,24 @@ void GLESRenderEngine::setupLayerTexturing(const Texture& texture) {
 
     mState.texture = texture;
     mState.textureEnabled = true;
+}
+
+void GLESRenderEngine::setupLayerExtTexturing(const Texture& texture)
+{
+    glActiveTexture(GL_TEXTURE1);
+    GLuint target = texture.getTextureTarget();
+    glBindTexture(target, texture.getTextureName());
+    GLenum filter = GL_NEAREST;
+    if (texture.getFiltering()) {
+        filter = GL_LINEAR;
+    }
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter);
+
+    mState.extTexture = texture;
+    mState.extTextureEnabled = true;
 }
 
 void GLESRenderEngine::setColorTransform(const mat4& colorTransform) {
@@ -1366,7 +1400,7 @@ void GLESRenderEngine::drawMesh(const Mesh& mesh) {
         glVertexAttribPointer(Program::shadowParams, mesh.getShadowParamsSize(), GL_FLOAT, GL_FALSE,
                               mesh.getByteStride(), mesh.getShadowParams());
     }
-
+    
     Description managedState = mState;
     // By default, DISPLAY_P3 is the only supported wide color output. However,
     // when HDR content is present, hardware composer may be able to handle

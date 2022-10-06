@@ -536,7 +536,7 @@ void Layer::preparePerFrameCompositionState() {
             isOpaque(drawingState) && !usesRoundedCorners && getAlpha() == 1.0_hf;
 
     // Force client composition for special cases known only to the front-end.
-    if (isHdrY410() || usesRoundedCorners || drawShadows() || ((float)getIndex()>0.0f && (float)getIndex()<1.0f)) {
+    if (isHdrY410() || usesRoundedCorners || drawShadows() || ((float)getIndex()>=0.0f && (float)getIndex()<1.0f)) {
         compositionState->forceClientComposition = true;
         ALOGE("BAT forceClientComposition set layerEF true %d %d %d %f", isHdrY410(), usesRoundedCorners, drawShadows(), (float)getIndex());
     }
@@ -2135,7 +2135,7 @@ half Layer::getAlpha() const {
 half Layer::getIndex() const {
     const auto& p = mDrawingParent.promote();
     half parentIndex = (p != nullptr) ? p->getIndex():1.0_hf;
-    if (parentIndex > 0.0_hf && parentIndex < 1.0_hf)
+    if (parentIndex >= 0.0_hf && parentIndex < 1.0_hf)
         return parentIndex;
     else
         return getDrawingState().index;

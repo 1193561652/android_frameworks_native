@@ -32,6 +32,7 @@
 #include <renderengine/private/Description.h>
 #include <sys/types.h>
 #include "GLShadowTexture.h"
+#include "GLExtTexture.h"
 #include "ImageManager.h"
 
 #define EGL_NO_CONFIG ((EGLConfig)0)
@@ -163,6 +164,7 @@ private:
     void setupLayerBlending(bool premultipliedAlpha, bool opaque, bool disableTexture,
                             const half4& color, float cornerRadius);
     void setupLayerTexturing(const Texture& texture);
+    void setupLayerExtTexturing(const Texture& texture);
     void setupFillWithColor(float r, float g, float b, float a);
     void setColorTransform(const mat4& colorTransform);
     void disableTexturing();
@@ -174,7 +176,8 @@ private:
     void setSourceDataSpace(ui::Dataspace source);
     void setOutputDataSpace(ui::Dataspace dataspace);
     void setDisplayMaxLuminance(const float maxLuminance);
-
+    bool buildExtTexture(float index);
+    
     // drawing
     void drawMesh(const Mesh& mesh);
 
@@ -190,6 +193,7 @@ private:
     GLuint mVpHeight;
     Description mState;
     GLShadowTexture mShadowTexture;
+    GLExtTexture mExtTexture;
 
     mat4 mSrgbToXyz;
     mat4 mDisplayP3ToXyz;
