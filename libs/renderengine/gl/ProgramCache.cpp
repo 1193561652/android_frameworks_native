@@ -724,13 +724,7 @@ String8 ProgramCache::generateFragmentShader(const Key& needs) {
     } else {
         if (needs.isTexturing()) {
             fs << "gl_FragColor = texture2D(sampler, outTexCoords);";
-#ifdef BAT
-            fs << "if (extIndex<1.0) {";
-            fs << "    vec4 extclor = texture2D(extsampler, outTexCoords);";
-            fs << "    if (extclor.a > 0.0) gl_FragColor = extclor;";
-            fs << "}";
-            // fs << "if(outTexCoords.x >= extIndex && outTexCoords.x <= extIndex+0.1 && extIndex > 0.0 && extIndex < 1.0) {gl_FragColor.r = 0.0; gl_FragColor.g = 0.0; gl_FragColor.b = 0.0; gl_FragColor.a = 1.0;}";
-#endif
+
             if (needs.isY410BT2020()) {
                 fs << "gl_FragColor.rgb = convertY410BT2020(gl_FragColor.rgb);";
             }
@@ -773,6 +767,17 @@ String8 ProgramCache::generateFragmentShader(const Key& needs) {
             fs << "gl_FragColor.a *= applyCornerRadius(outCropCoords);";
         }
     }
+
+#ifdef BAT
+    fs << "if (extIndex < 1.0) {";
+    fs << "    vec4 extclor = vec4(texture2D(extsampler, outTexCoords));";
+    fs << "    float fa = 1.0 - extclor.r;";
+    fs << "    gl_FragColor.r = 0.0 * fa + gl_FragColor.r * (1.0-fa) * gl_FragColor.a;";
+    fs << "    gl_FragColor.g = 0.0 * fa + gl_FragColor.g * (1.0-fa) * gl_FragColor.a;";
+    fs << "    gl_FragColor.b = 0.0 * fa + gl_FragColor.b * (1.0-fa) * gl_FragColor.a;";
+    fs << "    gl_FragColor.a = fa + gl_FragColor.a * (1.0-fa);";
+    fs << "}";
+#endif
 
     fs << dedent << "}";
     return fs.getString();

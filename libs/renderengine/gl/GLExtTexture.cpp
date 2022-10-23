@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <log/log.h>
 #include "GLExtTexture.h"
-
+#include "BatBitmap.h"
 namespace android {
 namespace renderengine {
 namespace gl {
@@ -45,22 +45,26 @@ GLExtTexture::~GLExtTexture() {
 }
 
 bool GLExtTexture::reload(int index) {
-    static uint8_t* data = new uint8_t[640*480*4];
+    // static uint8_t* data = new uint8_t[640*480*4];
 
     char filename[256] = {0};
-    index -= (index%10);
+    // index -= (index%10);
     snprintf(filename, sizeof(filename)-1, "/data/batman/%d.bmp", index);
-    int fd = open(filename, O_RDWR);
-    if (fd >= 0) {
-        // ALOGE("BAT read file %s index:%d succ", filename, index);
-        int readlen = read(fd, data, 640 * 480 * 4);
-        if (readlen != 640 * 480 * 4) {
-            ALOGE("BAT read file %s readlen:%d", filename, readlen);
-        }
-        close(fd);
-    } else {
-        ALOGE("BAT open file %s error %d", filename, errno);
-    }
+    // int fd = open(filename, O_RDWR);
+    // if (fd >= 0) {
+    //     // ALOGE("BAT read file %s index:%d succ", filename, index);
+    //     int readlen = read(fd, data, 640 * 480 * 4);
+    //     if (readlen != 640 * 480 * 4) {
+    //         ALOGE("BAT read file %s readlen:%d", filename, readlen);
+    //     }
+    //     close(fd);
+    // } else {
+    //     ALOGE("BAT open file %s error %d", filename, errno);
+    // }
+
+    static BatBitmap bmp;
+    bmp.loadBitmap(filename);
+
     
     // for (int r=0; r < 480; r++) {
     //     for (int c=0; c < 640; c++) {
@@ -78,7 +82,7 @@ bool GLExtTexture::reload(int index) {
     glActiveTexture(GL_TEXTURE1);
     
     glBindTexture(GL_TEXTURE_2D, mName);
-    glTexImage2D(GL_TEXTURE_2D, 0 /* base image level */, GL_RGBA, 640, 480, 0 /* border */, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0 /* base image level */, GL_RGB, bmp.getWidth(), bmp.getHeight(), 0 /* border */, GL_RGB, GL_UNSIGNED_BYTE, bmp.getByte());
 
     return true;
 }

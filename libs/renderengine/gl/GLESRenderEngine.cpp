@@ -1260,8 +1260,12 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
 }
 
 bool GLESRenderEngine::buildExtTexture(float index) {
-    if (index <1.0f) {
-        return mExtTexture.reload(index * 100);
+    if (index < 1.0f) {
+        // 0.0f-0.999
+        // 1-55
+        int iindex = (index * 55) + 1;
+        if (iindex > 55) iindex = 55;
+        return mExtTexture.reload(iindex);
     } else {
 
     }
